@@ -1,52 +1,40 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Activity, Zap, Settings, Wallet, ArrowUpRight, Target, BarChart3, Clock, DollarSign } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
-import { Progress } from "@/components/ui/progress"
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Zap, Settings, Wallet, Target, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
 
-// Mock data interfaces
+// Mock data interfaces (keeping the same)
 interface Token {
-  symbol: string
-  name: string
-  price: number
-  change24h: number
-  momentumScore: number
-  trend: "Very Bullish" | "Building" | "Fading" | "Bearish"
-  chains: string[]
-}
-
-interface Position {
-  id: string
-  token: string
-  chain: string
-  symbol: string
-  entryPrice: number
-  currentPrice: number
-  pnl: number
-  size: number
-  pnlPercentage: number
+  symbol: string;
+  name: string;
+  price: number;
+  change24h: number;
+  momentumScore: number;
+  trend: "Very Bullish" | "Building" | "Fading" | "Bearish";
+  chains: string[];
 }
 
 interface PriceData {
-  chain: string
-  symbol: string
-  price: number
-  change: number
+  chain: string;
+  symbol: string;
+  price: number;
+  change: number;
 }
 
 interface TradeExecution {
-  id: string
-  time: string
-  token: string
-  chains: string
-  status: "pending" | "executing" | "completed" | "failed"
-  pnl: number
+  id: string;
+  time: string;
+  token: string;
+  chains: string;
+  status: "pending" | "executing" | "completed" | "failed";
+  pnl: number;
 }
 
 // Mock data
@@ -69,7 +57,15 @@ const mockTokens: Token[] = [
     trend: "Building",
     chains: ["ETH", "MATIC", "ARB"],
   },
-  { symbol: "SOL", name: "Solana", price: 98.5, change24h: -2.1, momentumScore: 45, trend: "Fading", chains: ["SOL"] },
+  {
+    symbol: "SOL",
+    name: "Solana",
+    price: 98.5,
+    change24h: -2.1,
+    momentumScore: 45,
+    trend: "Fading",
+    chains: ["SOL"],
+  },
   {
     symbol: "MATIC",
     name: "Polygon",
@@ -115,43 +111,7 @@ const mockTokens: Token[] = [
     trend: "Fading",
     chains: ["DOT", "ETH"],
   },
-]
-
-const mockPositions: Position[] = [
-  {
-    id: "1",
-    token: "BTC",
-    chain: "Ethereum",
-    symbol: "wBTC",
-    entryPrice: 41200,
-    currentPrice: 43250,
-    pnl: 2050,
-    size: 0.5,
-    pnlPercentage: 4.97,
-  },
-  {
-    id: "2",
-    token: "ETH",
-    chain: "Polygon",
-    symbol: "ETH",
-    entryPrice: 2580,
-    currentPrice: 2650,
-    pnl: 70,
-    size: 2.0,
-    pnlPercentage: 2.71,
-  },
-  {
-    id: "3",
-    token: "MATIC",
-    chain: "Ethereum",
-    symbol: "MATIC",
-    entryPrice: 0.78,
-    currentPrice: 0.85,
-    pnl: 350,
-    size: 5000,
-    pnlPercentage: 8.97,
-  },
-]
+];
 
 const mockPriceComparison: { [key: string]: PriceData[] } = {
   BTC: [
@@ -164,123 +124,183 @@ const mockPriceComparison: { [key: string]: PriceData[] } = {
     { chain: "Polygon", symbol: "ETH", price: 2648, change: -0.08 },
     { chain: "Arbitrum", symbol: "ETH", price: 2652, change: 0.08 },
   ],
-}
+};
 
 const mockExecutions: TradeExecution[] = [
-  { id: "1", time: "14:32:15", token: "BTC", chains: "ETH→BSC", status: "completed", pnl: 125 },
-  { id: "2", time: "14:28:42", token: "MATIC", chains: "ETH→MATIC", status: "executing", pnl: 0 },
-  { id: "3", time: "14:25:18", token: "ETH", chains: "MATIC→ARB", status: "pending", pnl: 0 },
-  { id: "4", time: "14:20:33", token: "SOL", chains: "SOL", status: "failed", pnl: -45 },
-]
-
-const chainIcons: { [key: string]: string } = {
-  Ethereum: "🔷",
-  BSC: "🟡",
-  Polygon: "🟣",
-  Solana: "🌟",
-  Arbitrum: "🔵",
-  Optimism: "🔴",
-  Avalanche: "🔺",
-}
-
-const getTrendIcon = (trend: string) => {
-  switch (trend) {
-    case "Very Bullish":
-      return "🚀"
-    case "Building":
-      return "📈"
-    case "Fading":
-      return "⚡"
-    case "Bearish":
-      return "📉"
-    default:
-      return "📊"
-  }
-}
+  {
+    id: "1",
+    time: "14:32:15",
+    token: "BTC",
+    chains: "ETH→BSC",
+    status: "completed",
+    pnl: 125,
+  },
+  {
+    id: "2",
+    time: "14:28:42",
+    token: "MATIC",
+    chains: "ETH→MATIC",
+    status: "executing",
+    pnl: 0,
+  },
+  {
+    id: "3",
+    time: "14:25:18",
+    token: "ETH",
+    chains: "MATIC→ARB",
+    status: "pending",
+    pnl: 0,
+  },
+  {
+    id: "4",
+    time: "14:20:33",
+    token: "SOL",
+    chains: "SOL",
+    status: "failed",
+    pnl: -45,
+  },
+];
 
 const getTrendColor = (trend: string) => {
   switch (trend) {
     case "Very Bullish":
-      return "text-green-400"
+      return "text-[#0ea5e9]";
     case "Building":
-      return "text-blue-400"
+      return "text-[#0ea5e9]";
     case "Fading":
-      return "text-yellow-400"
+      return "text-[#ff4444]";
     case "Bearish":
-      return "text-red-400"
+      return "text-[#ff4444]";
     default:
-      return "text-gray-400"
+      return "text-[#a0a0a0]";
   }
-}
+};
 
-export default function MomentumSurferDashboard() {
-  const [momentumThreshold, setMomentumThreshold] = useState([5])
-  const [surfMode, setSurfMode] = useState(false)
-  const [selectedToken, setSelectedToken] = useState("BTC")
-  const [isConnected, setIsConnected] = useState(true)
-  const [currentTime, setCurrentTime] = useState(new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const filteredTokens = mockTokens.filter((token) => token.momentumScore >= momentumThreshold[0] * 10)
+// Simple line chart component
+const SimpleLineChart = () => {
+  const data = [100, 120, 115, 140, 135, 160, 155, 180, 175, 200, 195, 220];
+  const max = Math.max(...data);
+  const min = Math.min(...data);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white overflow-hidden">
-      {/* Animated background particles */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-30"
-            animate={{
-              x: [0, Math.random() * 100 - 50],
-              y: [0, Math.random() * 100 - 50],
-              opacity: [0.3, 0.8, 0.3],
-            }}
-            transition={{
-              duration: Math.random() * 3 + 2,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-          />
-        ))}
-      </div>
+    <div className="h-24 w-full relative">
+      <svg className="w-full h-full" viewBox="0 0 300 100">
+        <polyline
+          fill="none"
+          stroke="#0ea5e9"
+          strokeWidth="2"
+          points={data
+            .map((value, index) => {
+              const x = (index / (data.length - 1)) * 300;
+              const y = 100 - ((value - min) / (max - min)) * 80;
+              return `${x},${y}`;
+            })
+            .join(" ")}
+        />
+      </svg>
+    </div>
+  );
+};
 
+// Loading skeleton component
+const TokenSkeleton = () => (
+  <Card className="bg-[#1a1a1a] border-[#333333]">
+    <CardContent className="p-4">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="h-6 w-16 bg-[#333333] rounded animate-pulse" />
+          <div className="h-5 w-12 bg-[#333333] rounded animate-pulse" />
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <div className="h-4 w-8 bg-[#333333] rounded animate-pulse" />
+            <div className="h-4 w-20 bg-[#333333] rounded animate-pulse" />
+          </div>
+          <div className="h-2 w-full bg-[#333333] rounded animate-pulse" />
+          <div className="h-4 w-24 bg-[#333333] rounded animate-pulse" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+export default function MomentumSurferDashboard() {
+  const [momentumThreshold, setMomentumThreshold] = useState([5]);
+  const [surfMode, setSurfMode] = useState(false);
+  const [selectedToken, setSelectedToken] = useState("BTC");
+  const [isConnected, setIsConnected] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanningDots, setScanningDots] = useState("");
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Scanning dots animation
+  useEffect(() => {
+    if (isScanning) {
+      const dotsTimer = setInterval(() => {
+        setScanningDots((prev) => {
+          if (prev === "...") return "";
+          return prev + ".";
+        });
+      }, 500);
+      return () => clearInterval(dotsTimer);
+    }
+  }, [isScanning]);
+
+  const handleMomentumScan = () => {
+    setIsScanning(true);
+    setTimeout(() => {
+      setIsScanning(false);
+      setScanningDots("");
+    }, 2500);
+  };
+
+  const filteredTokens = mockTokens.filter(
+    (token) => token.momentumScore >= momentumThreshold[0] * 10
+  );
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Header */}
-      <header className="relative z-10 border-b border-gray-800/50 backdrop-blur-xl bg-black/20">
+      <header className="border-b border-[#333333] bg-[#0a0a0a]">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <motion.h1
-                className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent"
-                animate={{ opacity: [0.8, 1, 0.8] }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+              <h1 className="text-2xl font-bold text-white">
+                Multi-Chain Momentum Surfer
+              </h1>
+              <Badge
+                variant="outline"
+                className="border-[#0ea5e9] text-[#0ea5e9]"
               >
-                Multi-Chain Momentum Surfer 🏄‍♂️
-              </motion.h1>
-              <Badge variant="outline" className="border-green-500 text-green-400">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
+                <div className="w-2 h-2 bg-[#0ea5e9] rounded-full mr-2 animate-pulse" />
                 LIVE
               </Badge>
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-400 font-mono">{currentTime.toLocaleTimeString()}</div>
+              <div className="text-sm text-[#a0a0a0] font-mono">
+                {currentTime.toLocaleTimeString()}
+              </div>
               <div className="flex items-center space-x-2">
                 <Wallet className="w-4 h-4" />
-                <span className={`text-sm ${isConnected ? "text-green-400" : "text-red-400"}`}>
+                <span
+                  className={`text-sm ${
+                    isConnected ? "text-[#0ea5e9]" : "text-[#ff4444]"
+                  }`}
+                >
                   {isConnected ? "Connected" : "Disconnected"}
                 </span>
               </div>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-[#a0a0a0] hover:text-white border-[#333333]"
+              >
                 <Settings className="w-4 h-4" />
               </Button>
             </div>
@@ -288,19 +308,20 @@ export default function MomentumSurferDashboard() {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-6 relative z-10">
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-          {/* Section 1 - Live Momentum Scanner */}
-          <Card className="xl:col-span-2 bg-black/40 border-gray-800/50 backdrop-blur-xl">
+      <main className="container mx-auto px-6 py-6">
+        <div className="grid grid-cols-1 gap-6 mb-6">
+          {/* Section 1 - Momentum Scanner */}
+          <Card className="bg-[#1a1a1a] border-[#333333]">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-bold text-cyan-400 flex items-center">
-                  <Activity className="w-5 h-5 mr-2" />
-                  Live Momentum Scanner
+                <CardTitle className="text-lg font-medium text-white">
+                  Momentum Scanner
                 </CardTitle>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-400">Threshold:</span>
+                    <span className="text-sm text-[#a0a0a0] font-semibold">
+                      Threshold:
+                    </span>
                     <div className="w-32">
                       <Slider
                         value={momentumThreshold}
@@ -311,154 +332,129 @@ export default function MomentumSurferDashboard() {
                         className="w-full"
                       />
                     </div>
-                    <span className="text-sm text-cyan-400 font-mono">{momentumThreshold[0]}%</span>
+                    <span className="text-sm text-[#0ea5e9] font-mono font-bold">
+                      {momentumThreshold[0]}%
+                    </span>
                   </div>
                   <Button
-                    className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
+                    className="bg-[#0ea5e9] hover:bg-[#0284c7] text-black font-bold"
                     size="sm"
+                    onClick={handleMomentumScan}
+                    disabled={isScanning}
                   >
-                    <Target className="w-4 h-4 mr-2" />
-                    DETECT NOW
+                    {isScanning ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        SCANNING...
+                      </>
+                    ) : (
+                      <>
+                        <Target className="w-4 h-4 mr-2" />
+                        DETECT MOMENTUM
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>
+              {isScanning && (
+                <div className="text-[#a0a0a0] text-sm font-mono">
+                  Analyzing market data{scanningDots}
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {filteredTokens.map((token, index) => (
-                  <motion.div
-                    key={token.symbol}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="relative"
-                  >
-                    <Card className="bg-gray-900/50 border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 backdrop-blur-sm">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-bold text-lg">{token.symbol}</span>
-                            <div className="flex space-x-1">
-                              {token.chains.map((chain) => (
-                                <span key={chain} className="text-xs">
-                                  {chainIcons[chain] || "⚪"}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <Badge
-                            variant="outline"
-                            className={`${
-                              token.change24h >= 3
-                                ? "border-green-500 text-green-400"
-                                : token.change24h <= -3
-                                  ? "border-red-500 text-red-400"
-                                  : "border-gray-500 text-gray-400"
-                            }`}
-                          >
-                            {token.change24h >= 0 ? "+" : ""}
-                            {token.change24h.toFixed(1)}%
-                          </Badge>
-                        </div>
+                <AnimatePresence mode="wait">
+                  {isScanning
+                    ? // Show skeleton loading states
+                      [...Array(8)].map((_, index) => (
+                        <TokenSkeleton key={`skeleton-${index}`} />
+                      ))
+                    : // Show actual token data
+                      filteredTokens.map((token, index) => (
+                        <motion.div
+                          key={token.symbol}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <Card className="bg-[#1a1a1a] border-[#333333] hover:border-[#555555] transition-colors">
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-bold text-lg text-white">
+                                    {token.symbol}
+                                  </span>
+                                  <div className="text-xs text-[#a0a0a0]">
+                                    {token.chains.length} chains
+                                  </div>
+                                </div>
+                                <Badge
+                                  variant="outline"
+                                  className={`${
+                                    token.change24h >= 3
+                                      ? "border-[#0ea5e9] text-[#0ea5e9]"
+                                      : token.change24h <= -3
+                                      ? "border-[#ff4444] text-[#ff4444]"
+                                      : "border-[#333333] text-[#a0a0a0]"
+                                  }`}
+                                >
+                                  {token.change24h >= 0 ? "+" : ""}
+                                  {token.change24h.toFixed(1)}%
+                                </Badge>
+                              </div>
 
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-400 text-sm">Price</span>
-                            <span className="font-mono text-white">${token.price.toLocaleString()}</span>
-                          </div>
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[#a0a0a0] text-sm font-semibold">
+                                    Price
+                                  </span>
+                                  <span className="font-mono text-white font-bold">
+                                    ${token.price.toLocaleString()}
+                                  </span>
+                                </div>
 
-                          <div className="space-y-1">
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400 text-sm">Momentum</span>
-                              <span className="font-mono text-cyan-400">{token.momentumScore}/100</span>
-                            </div>
-                            <Progress value={token.momentumScore} className="h-2 bg-gray-800" />
-                          </div>
+                                <div className="space-y-1">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[#a0a0a0] text-sm font-semibold">
+                                      Momentum
+                                    </span>
+                                    <span className="font-mono text-[#0ea5e9] font-bold">
+                                      {token.momentumScore}/100
+                                    </span>
+                                  </div>
+                                  <Progress
+                                    value={token.momentumScore}
+                                    className="h-2 bg-[#333333]"
+                                  />
+                                </div>
 
-                          <div className="flex items-center justify-between">
-                            <span className={`text-sm flex items-center ${getTrendColor(token.trend)}`}>
-                              <span className="mr-1">{getTrendIcon(token.trend)}</span>
-                              {token.trend}
-                            </span>
-                          </div>
-                        </div>
-
-                        {token.momentumScore >= 80 && (
-                          <motion.div
-                            className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"
-                            animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
-                            transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                          />
-                        )}
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+                                <div className="flex items-center justify-between">
+                                  <span
+                                    className={`text-sm font-semibold ${getTrendColor(
+                                      token.trend
+                                    )}`}
+                                  >
+                                    {token.trend}
+                                  </span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      ))}
+                </AnimatePresence>
               </div>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {/* Section 2 - Cross-Chain Positions Tracker */}
-          <Card className="bg-black/40 border-gray-800/50 backdrop-blur-xl">
+          {/* Section 3 - Cross-Chain Prices */}
+          <Card className="bg-[#1a1a1a] border-[#333333]">
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-purple-400 flex items-center">
-                <BarChart3 className="w-5 h-5 mr-2" />
-                Cross-Chain Positions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {mockPositions.map((position) => (
-                  <motion.div
-                    key={position.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50 border border-gray-700/50 hover:border-gray-600/50 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="flex items-center space-x-2">
-                        <span className="font-bold">{position.token}</span>
-                        <span className="text-xs text-gray-400">{chainIcons[position.chain]}</span>
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        <div className="font-mono">${position.entryPrice.toLocaleString()}</div>
-                        <div className="text-xs">Entry</div>
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-mono">${position.currentPrice.toLocaleString()}</div>
-                        <div className="text-xs text-gray-400">Current</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                      <div className="text-right">
-                        <div className={`font-mono ${position.pnl >= 0 ? "text-green-400" : "text-red-400"}`}>
-                          {position.pnl >= 0 ? "+" : ""}${position.pnl.toFixed(0)}
-                        </div>
-                        <div className={`text-xs ${position.pnlPercentage >= 0 ? "text-green-400" : "text-red-400"}`}>
-                          {position.pnlPercentage >= 0 ? "+" : ""}
-                          {position.pnlPercentage.toFixed(2)}%
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline" className="text-xs bg-transparent">
-                          Close
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Section 3 - Cross-Chain Price Comparison */}
-          <Card className="bg-black/40 border-gray-800/50 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-yellow-400 flex items-center">
-                <ArrowUpRight className="w-5 h-5 mr-2" />
-                Price Arbitrage Scanner
+              <CardTitle className="text-lg font-medium text-white">
+                Cross-Chain Prices
               </CardTitle>
               <div className="flex space-x-2">
                 {Object.keys(mockPriceComparison).map((token) => (
@@ -467,7 +463,11 @@ export default function MomentumSurferDashboard() {
                     size="sm"
                     variant={selectedToken === token ? "default" : "outline"}
                     onClick={() => setSelectedToken(token)}
-                    className="text-xs"
+                    className={`text-xs font-semibold ${
+                      selectedToken === token
+                        ? "bg-[#0ea5e9] text-black hover:bg-[#0284c7]"
+                        : "bg-transparent border-[#333333] text-[#a0a0a0] hover:text-white"
+                    }`}
                   >
                     {token}
                   </Button>
@@ -477,141 +477,222 @@ export default function MomentumSurferDashboard() {
             <CardContent>
               <div className="space-y-3">
                 {mockPriceComparison[selectedToken]?.map((price, index) => {
-                  const minPrice = Math.min(...mockPriceComparison[selectedToken].map((p) => p.price))
-                  const maxPrice = Math.max(...mockPriceComparison[selectedToken].map((p) => p.price))
-                  const arbitrageOpportunity = ((maxPrice - minPrice) / minPrice) * 100
-                  const isArbitrage = arbitrageOpportunity > 1
+                  const minPrice = Math.min(
+                    ...mockPriceComparison[selectedToken].map((p) => p.price)
+                  );
+                  const maxPrice = Math.max(
+                    ...mockPriceComparison[selectedToken].map((p) => p.price)
+                  );
+                  const arbitrageOpportunity =
+                    ((maxPrice - minPrice) / minPrice) * 100;
+                  const isArbitrage = arbitrageOpportunity > 1;
 
                   return (
-                    <motion.div
+                    <div
                       key={index}
                       className={`p-3 rounded-lg border transition-all ${
-                        isArbitrage && (price.price === minPrice || price.price === maxPrice)
-                          ? "bg-yellow-900/20 border-yellow-500/50 shadow-yellow-500/20 shadow-lg"
-                          : "bg-gray-900/50 border-gray-700/50"
+                        isArbitrage &&
+                        (price.price === minPrice || price.price === maxPrice)
+                          ? "bg-[#0a0a0a] border-[#0ea5e9]"
+                          : "bg-[#0a0a0a] border-[#333333]"
                       }`}
-                      whileHover={{ scale: 1.02 }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm">{chainIcons[price.chain]}</span>
-                          <span className="font-medium">{price.chain}</span>
-                          <span className="text-sm text-gray-400">{price.symbol}</span>
+                          <span className="font-semibold text-white">
+                            {price.chain}
+                          </span>
+                          <span className="text-sm text-[#a0a0a0]">
+                            {price.symbol}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-3">
                           <div className="text-right">
-                            <div className="font-mono">${price.price.toLocaleString()}</div>
-                            <div className={`text-xs ${price.change >= 0 ? "text-green-400" : "text-red-400"}`}>
+                            <div className="font-mono font-bold text-white">
+                              ${price.price.toLocaleString()}
+                            </div>
+                            <div
+                              className={`text-xs font-semibold ${
+                                price.change >= 0
+                                  ? "text-[#0ea5e9]"
+                                  : "text-[#ff4444]"
+                              }`}
+                            >
                               {price.change >= 0 ? "+" : ""}
                               {price.change.toFixed(2)}%
                             </div>
                           </div>
                           {isArbitrage && price.price === minPrice && (
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-xs">
+                            <Button
+                              size="sm"
+                              className="bg-[#0ea5e9] hover:bg-[#0284c7] text-black text-xs font-bold"
+                            >
                               Buy Here
                             </Button>
                           )}
                           {isArbitrage && price.price === maxPrice && (
-                            <Button size="sm" className="bg-red-600 hover:bg-red-700 text-xs">
+                            <Button
+                              size="sm"
+                              className="bg-[#ff4444] hover:bg-[#cc3333] text-white text-xs font-bold"
+                            >
                               Sell Here
                             </Button>
                           )}
                         </div>
                       </div>
-                    </motion.div>
-                  )
+                    </div>
+                  );
                 })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Performance Metrics - Full Width */}
+          <Card className="bg-[#1a1a1a] border-[#333333]">
+            <CardHeader>
+              <CardTitle className="text-lg font-medium text-white">
+                Surfing Metrics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
+                  <div className="text-2xl font-black text-[#0ea5e9]">
+                    $1,240
+                  </div>
+                  <div className="text-sm text-[#a0a0a0] font-semibold">
+                    Today's P&L
+                  </div>
+                  <div className="text-xs text-[#0ea5e9] font-bold">+11.2%</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
+                  <div className="text-2xl font-black text-white">12</div>
+                  <div className="text-sm text-[#a0a0a0] font-semibold">
+                    Momentum Trades
+                  </div>
+                  <div className="text-xs text-[#a0a0a0] font-bold">Today</div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
+                  <div className="text-2xl font-black text-white">24m</div>
+                  <div className="text-sm text-[#a0a0a0] font-semibold">
+                    Avg Surf Time
+                  </div>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
+                  <div className="text-2xl font-black text-white">BSC</div>
+                  <div className="text-sm text-[#a0a0a0] font-semibold">
+                    Best Chain
+                  </div>
+                  <div className="text-xs text-[#0ea5e9] font-bold">+$340</div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-[#0a0a0a] border border-[#333333] mb-4">
+                <div className="text-sm text-[#a0a0a0] font-semibold mb-3">
+                  Account Growth
+                </div>
+                <SimpleLineChart />
+              </div>
+
+              <div className="p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-[#a0a0a0] font-semibold">
+                    Surf Mode
+                  </span>
+                  <Switch checked={surfMode} onCheckedChange={setSurfMode} />
+                </div>
+                <div className="text-xs text-[#a0a0a0] mb-3">
+                  Auto-execute when momentum &gt;5% detected
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[#a0a0a0] font-semibold">
+                      Risk Level:
+                    </span>
+                    <div className="flex space-x-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-6 px-2 bg-transparent border-[#333333] text-[#a0a0a0]"
+                      >
+                        Low
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="text-xs h-6 px-2 bg-[#0ea5e9] text-black font-bold"
+                      >
+                        Medium
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-6 px-2 bg-transparent border-[#333333] text-[#a0a0a0]"
+                      >
+                        High
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[#a0a0a0] font-semibold">
+                      Max Per Surf:
+                    </span>
+                    <span className="text-xs text-white font-mono font-bold">
+                      $500
+                    </span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
-          {/* Section 4 - Execution Timeline */}
-          <Card className="bg-black/40 border-gray-800/50 backdrop-blur-xl">
+        <div className="grid grid-cols-1 gap-6 mt-6">
+          {/* Section 4 - Trade Log */}
+          <Card className="bg-[#1a1a1a] border-[#333333]">
             <CardHeader>
-              <CardTitle className="text-lg font-bold text-green-400 flex items-center">
-                <Clock className="w-5 h-5 mr-2" />
-                Execution Timeline
+              <CardTitle className="text-lg font-medium text-white">
+                Trade Log
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {mockExecutions.map((execution) => (
-                  <motion.div
+                  <div
                     key={execution.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50 border border-gray-700/50"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center justify-between p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]"
                   >
                     <div className="flex items-center space-x-3">
-                      <div
-                        className={`w-3 h-3 rounded-full ${
-                          execution.status === "completed"
-                            ? "bg-green-400"
-                            : execution.status === "executing"
-                              ? "bg-blue-400 animate-pulse"
-                              : execution.status === "pending"
-                                ? "bg-yellow-400"
-                                : "bg-red-400"
-                        }`}
-                      />
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-mono text-sm text-gray-400">{execution.time}</span>
-                          <span className="font-medium">{execution.token}</span>
-                          <span className="text-sm text-gray-400">{execution.chains}</span>
+                          <span className="font-mono text-sm text-[#a0a0a0] font-semibold">
+                            {execution.time}
+                          </span>
+                          <span className="font-semibold text-white">
+                            {execution.token}
+                          </span>
+                          <span className="text-sm text-[#a0a0a0]">
+                            {execution.chains}
+                          </span>
                         </div>
-                        <div className="text-xs text-gray-500 capitalize">{execution.status}</div>
+                        <div className="text-xs text-[#a0a0a0] capitalize font-semibold">
+                          {execution.status}
+                        </div>
                       </div>
                     </div>
                     {execution.pnl !== 0 && (
-                      <div className={`font-mono text-sm ${execution.pnl >= 0 ? "text-green-400" : "text-red-400"}`}>
+                      <div
+                        className={`font-mono text-sm font-bold ${
+                          execution.pnl >= 0
+                            ? "text-[#0ea5e9]"
+                            : "text-[#ff4444]"
+                        }`}
+                      >
                         {execution.pnl >= 0 ? "+" : ""}${execution.pnl}
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Performance Metrics */}
-          <Card className="bg-black/40 border-gray-800/50 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-cyan-400 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2" />
-                Performance Metrics
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 rounded-lg bg-gray-900/50">
-                  <div className="text-2xl font-bold text-green-400">$12,450</div>
-                  <div className="text-sm text-gray-400">Portfolio Value</div>
-                  <div className="text-xs text-green-400">+8.3%</div>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-gray-900/50">
-                  <div className="text-2xl font-bold text-cyan-400">$1,240</div>
-                  <div className="text-sm text-gray-400">Today's P&L</div>
-                  <div className="text-xs text-cyan-400">+11.2%</div>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-gray-900/50">
-                  <div className="text-2xl font-bold text-purple-400">73%</div>
-                  <div className="text-sm text-gray-400">Win Rate</div>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-gray-900/50">
-                  <div className="text-2xl font-bold text-yellow-400">42</div>
-                  <div className="text-sm text-gray-400">Trades Today</div>
-                </div>
-              </div>
-
-              <div className="mt-4 p-3 rounded-lg bg-gray-900/50">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-400">Surf Mode</span>
-                  <Switch checked={surfMode} onCheckedChange={setSurfMode} />
-                </div>
-                <div className="text-xs text-gray-500">Auto-execute trades when momentum detected</div>
               </div>
             </CardContent>
           </Card>
@@ -619,15 +700,26 @@ export default function MomentumSurferDashboard() {
       </main>
 
       {/* Floating Action Button */}
-      <motion.div className="fixed bottom-8 right-8 z-20" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+      <div className="fixed bottom-8 right-8 z-20">
         <Button
           size="lg"
-          className="rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 shadow-lg shadow-cyan-500/25"
+          className="rounded-full bg-[#0ea5e9] hover:bg-[#0284c7] text-black font-black shadow-lg"
+          onClick={handleMomentumScan}
+          disabled={isScanning}
         >
-          <Zap className="w-5 h-5 mr-2" />
-          DETECT MOMENTUM NOW
+          {isScanning ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              SCANNING...
+            </>
+          ) : (
+            <>
+              <Zap className="w-5 h-5 mr-2" />
+              DETECT MOMENTUM NOW
+            </>
+          )}
         </Button>
-      </motion.div>
+      </div>
     </div>
-  )
+  );
 }
