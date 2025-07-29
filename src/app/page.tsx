@@ -131,7 +131,7 @@ const mockExecutions: TradeExecution[] = [
     id: "1",
     time: "14:32:15",
     token: "BTC",
-    chains: "ETH→BSC",
+    chains: "ETH->BSC",
     status: "completed",
     pnl: 125,
   },
@@ -139,7 +139,7 @@ const mockExecutions: TradeExecution[] = [
     id: "2",
     time: "14:28:42",
     token: "MATIC",
-    chains: "ETH→MATIC",
+    chains: "ETH->MATIC",
     status: "executing",
     pnl: 0,
   },
@@ -147,7 +147,7 @@ const mockExecutions: TradeExecution[] = [
     id: "3",
     time: "14:25:18",
     token: "ETH",
-    chains: "MATIC→ARB",
+    chains: "MATIC->ARB",
     status: "pending",
     pnl: 0,
   },
@@ -164,35 +164,35 @@ const mockExecutions: TradeExecution[] = [
 const getTrendColor = (trend: string) => {
   switch (trend) {
     case "Very Bullish":
-      return "text-[#0ea5e9]";
+      return "text-[#00ff00]";
     case "Building":
-      return "text-[#0ea5e9]";
+      return "text-[#00ff00]";
     case "Fading":
-      return "text-[#ff4444]";
+      return "text-[#ff0000]";
     case "Bearish":
-      return "text-[#ff4444]";
+      return "text-[#ff0000]";
     default:
-      return "text-[#a0a0a0]";
+      return "text-black";
   }
 };
 
-// Simple line chart component
-const SimpleLineChart = () => {
+// Simple 8-bit style line chart component
+const RetroLineChart = () => {
   const data = [100, 120, 115, 140, 135, 160, 155, 180, 175, 200, 195, 220];
   const max = Math.max(...data);
   const min = Math.min(...data);
 
   return (
-    <div className="h-24 w-full relative">
-      <svg className="w-full h-full" viewBox="0 0 300 100">
+    <div className="h-16 w-full relative border border-black">
+      <svg className="w-full h-full" viewBox="0 0 300 64">
         <polyline
           fill="none"
-          stroke="#0ea5e9"
-          strokeWidth="2"
+          stroke="#00ff00"
+          strokeWidth="1"
           points={data
             .map((value, index) => {
-              const x = (index / (data.length - 1)) * 300;
-              const y = 100 - ((value - min) / (max - min)) * 80;
+              const x = (index / (data.length - 1)) * 298 + 1;
+              const y = 63 - ((value - min) / (max - min)) * 62;
               return `${x},${y}`;
             })
             .join(" ")}
@@ -204,20 +204,20 @@ const SimpleLineChart = () => {
 
 // Loading skeleton component
 const TokenSkeleton = () => (
-  <Card className="bg-[#1a1a1a] border-[#333333]">
-    <CardContent className="p-4">
-      <div className="space-y-3">
+  <Card className="bg-[#f5f5f0] border border-black rounded-none">
+    <CardContent className="p-3">
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <div className="h-6 w-16 bg-[#333333] rounded animate-pulse" />
-          <div className="h-5 w-12 bg-[#333333] rounded animate-pulse" />
+          <div className="h-4 w-12 bg-black/20 animate-pulse" />
+          <div className="h-3 w-8 bg-black/20 animate-pulse" />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="flex justify-between">
-            <div className="h-4 w-8 bg-[#333333] rounded animate-pulse" />
-            <div className="h-4 w-20 bg-[#333333] rounded animate-pulse" />
+            <div className="h-3 w-6 bg-black/20 animate-pulse" />
+            <div className="h-3 w-16 bg-black/20 animate-pulse" />
           </div>
-          <div className="h-2 w-full bg-[#333333] rounded animate-pulse" />
-          <div className="h-4 w-24 bg-[#333333] rounded animate-pulse" />
+          <div className="h-2 w-full bg-black/20 animate-pulse" />
+          <div className="h-3 w-20 bg-black/20 animate-pulse" />
         </div>
       </div>
     </CardContent>
@@ -264,65 +264,66 @@ export default function MomentumSurferDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#f5f5f0] text-black font-mono text-xs">
       {/* Header */}
-      <header className="border-b border-[#333333] bg-[#0a0a0a]">
-        <div className="container mx-auto px-6 py-4">
+      <header className="border-b border-black bg-[#f5f5f0]">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-white">
-                Multi-Chain Momentum Surfer
+            <div className="flex items-center space-x-3">
+              <h1 className="text-sm font-bold text-black">
+                MULTI-CHAIN MOMENTUM SURFER
               </h1>
               <Badge
                 variant="outline"
-                className="border-[#0ea5e9] text-[#0ea5e9]"
+                className="border-black text-black bg-[#f5f5f0] rounded-none text-xs"
               >
-                <div className="w-2 h-2 bg-[#0ea5e9] rounded-full mr-2 animate-pulse" />
+                <div className="w-1 h-1 bg-[#00ff00] mr-1 animate-pulse" />
                 LIVE
               </Badge>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-[#a0a0a0] font-mono">
+            <div className="flex items-center space-x-3">
+              <div className="text-xs text-black">
                 {currentTime.toLocaleTimeString()}
               </div>
-              <div className="flex items-center space-x-2">
-                <Wallet className="w-4 h-4" />
+              <div className="flex items-center space-x-1">
+                <Wallet className="w-3 h-3" />
                 <span
-                  className={`text-sm ${
-                    isConnected ? "text-[#0ea5e9]" : "text-[#ff4444]"
+                  className={`text-xs ${
+                    isConnected ? "text-[#00ff00]" : "text-[#ff0000]"
                   }`}
                 >
-                  {isConnected ? "Connected" : "Disconnected"}
+                  {isConnected ? "CONNECTED" : "DISCONNECTED"}
                 </span>
               </div>
               <Button
                 variant="ghost"
-                size="icon"
-                className="text-[#a0a0a0] hover:text-white border-[#333333]"
+                size="sm"
+                className="text-black hover:bg-black/10 border border-black rounded-none p-1"
               >
-                <Settings className="w-4 h-4" />
+                <Settings className="w-3 h-3" />
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-6">
-        <div className="grid grid-cols-1 gap-6 mb-6">
+      <main className="container mx-auto px-4 py-4">
+        {/* Divider Line */}
+        <div className="w-full h-px bg-black mb-4" />
+
+        <div className="grid grid-cols-1 gap-4 mb-4">
           {/* Section 1 - Momentum Scanner */}
-          <Card className="bg-[#1a1a1a] border-[#333333]">
-            <CardHeader className="pb-4">
+          <Card className="bg-[#f5f5f0] border border-black rounded-none">
+            <CardHeader className="pb-2 border-b border-black">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-medium text-white">
-                  Momentum Scanner
+                <CardTitle className="text-sm font-bold text-black">
+                  MOMENTUM SCANNER
                 </CardTitle>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-[#a0a0a0] font-semibold">
-                      Threshold:
-                    </span>
-                    <div className="w-32">
+                    <span className="text-xs text-black">THRESHOLD:</span>
+                    <div className="w-24">
                       <Slider
                         value={momentumThreshold}
                         onValueChange={setMomentumThreshold}
@@ -332,38 +333,38 @@ export default function MomentumSurferDashboard() {
                         className="w-full"
                       />
                     </div>
-                    <span className="text-sm text-[#0ea5e9] font-mono font-bold">
+                    <span className="text-xs text-[#00ff00] font-bold">
                       {momentumThreshold[0]}%
                     </span>
                   </div>
                   <Button
-                    className="bg-[#0ea5e9] hover:bg-[#0284c7] text-black font-bold"
+                    className="bg-[#f5f5f0] hover:bg-black/10 text-black font-bold border border-black rounded-none text-xs px-2 py-1"
                     size="sm"
                     onClick={handleMomentumScan}
                     disabled={isScanning}
                   >
                     {isScanning ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                         SCANNING...
                       </>
                     ) : (
                       <>
-                        <Target className="w-4 h-4 mr-2" />
-                        DETECT MOMENTUM
+                        <Target className="w-3 h-3 mr-1" />
+                        DETECT
                       </>
                     )}
                   </Button>
                 </div>
               </div>
               {isScanning && (
-                <div className="text-[#a0a0a0] text-sm font-mono">
-                  Analyzing market data{scanningDots}
+                <div className="text-black text-xs">
+                  ANALYZING MARKET DATA{scanningDots}
                 </div>
               )}
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <CardContent className="p-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 <AnimatePresence mode="wait">
                   {isScanning
                     ? // Show skeleton loading states
@@ -374,30 +375,30 @@ export default function MomentumSurferDashboard() {
                       filteredTokens.map((token, index) => (
                         <motion.div
                           key={token.symbol}
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
+                          transition={{ delay: index * 0.05 }}
                         >
-                          <Card className="bg-[#1a1a1a] border-[#333333] hover:border-[#555555] transition-colors">
-                            <CardContent className="p-4">
+                          <Card className="bg-[#f5f5f0] border border-black rounded-none hover:bg-black/5 transition-colors">
+                            <CardContent className="p-3">
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center space-x-2">
-                                  <span className="font-bold text-lg text-white">
+                                  <span className="font-bold text-sm text-black">
                                     {token.symbol}
                                   </span>
-                                  <div className="text-xs text-[#a0a0a0]">
-                                    {token.chains.length} chains
+                                  <div className="text-xs text-black">
+                                    {token.chains.length}CH
                                   </div>
                                 </div>
                                 <Badge
                                   variant="outline"
-                                  className={`${
+                                  className={`rounded-none text-xs border ${
                                     token.change24h >= 3
-                                      ? "border-[#0ea5e9] text-[#0ea5e9]"
+                                      ? "border-[#00ff00] text-[#00ff00]"
                                       : token.change24h <= -3
-                                      ? "border-[#ff4444] text-[#ff4444]"
-                                      : "border-[#333333] text-[#a0a0a0]"
-                                  }`}
+                                      ? "border-[#ff0000] text-[#ff0000]"
+                                      : "border-black text-black"
+                                  } bg-[#f5f5f0]`}
                                 >
                                   {token.change24h >= 0 ? "+" : ""}
                                   {token.change24h.toFixed(1)}%
@@ -406,36 +407,36 @@ export default function MomentumSurferDashboard() {
 
                               <div className="space-y-2">
                                 <div className="flex justify-between items-center">
-                                  <span className="text-[#a0a0a0] text-sm font-semibold">
-                                    Price
+                                  <span className="text-black text-xs">
+                                    PRICE
                                   </span>
-                                  <span className="font-mono text-white font-bold">
+                                  <span className="text-black font-bold text-xs">
                                     ${token.price.toLocaleString()}
                                   </span>
                                 </div>
 
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
-                                    <span className="text-[#a0a0a0] text-sm font-semibold">
-                                      Momentum
+                                    <span className="text-black text-xs">
+                                      MOMENTUM
                                     </span>
-                                    <span className="font-mono text-[#0ea5e9] font-bold">
+                                    <span className="text-[#00ff00] font-bold text-xs">
                                       {token.momentumScore}/100
                                     </span>
                                   </div>
                                   <Progress
                                     value={token.momentumScore}
-                                    className="h-2 bg-[#333333]"
+                                    className="h-2 bg-[#f5f5f0] border border-black rounded-none"
                                   />
                                 </div>
 
                                 <div className="flex items-center justify-between">
                                   <span
-                                    className={`text-sm font-semibold ${getTrendColor(
+                                    className={`text-xs font-bold ${getTrendColor(
                                       token.trend
                                     )}`}
                                   >
-                                    {token.trend}
+                                    {token.trend.toUpperCase()}
                                   </span>
                                 </div>
                               </div>
@@ -449,24 +450,27 @@ export default function MomentumSurferDashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Divider Line */}
+        <div className="w-full h-px bg-black mb-4" />
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {/* Section 3 - Cross-Chain Prices */}
-          <Card className="bg-[#1a1a1a] border-[#333333]">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium text-white">
-                Cross-Chain Prices
+          <Card className="bg-[#f5f5f0] border border-black rounded-none">
+            <CardHeader className="border-b border-black pb-2">
+              <CardTitle className="text-sm font-bold text-black">
+                CROSS-CHAIN PRICES
               </CardTitle>
-              <div className="flex space-x-2">
+              <div className="flex space-x-1">
                 {Object.keys(mockPriceComparison).map((token) => (
                   <Button
                     key={token}
                     size="sm"
                     variant={selectedToken === token ? "default" : "outline"}
                     onClick={() => setSelectedToken(token)}
-                    className={`text-xs font-semibold ${
+                    className={`text-xs font-bold rounded-none border border-black ${
                       selectedToken === token
-                        ? "bg-[#0ea5e9] text-black hover:bg-[#0284c7]"
-                        : "bg-transparent border-[#333333] text-[#a0a0a0] hover:text-white"
+                        ? "bg-black text-[#f5f5f0] hover:bg-black/80"
+                        : "bg-[#f5f5f0] text-black hover:bg-black/10"
                     }`}
                   >
                     {token}
@@ -474,8 +478,8 @@ export default function MomentumSurferDashboard() {
                 ))}
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="p-3">
+              <div className="space-y-2">
                 {mockPriceComparison[selectedToken]?.map((price, index) => {
                   const minPrice = Math.min(
                     ...mockPriceComparison[selectedToken].map((p) => p.price)
@@ -490,32 +494,32 @@ export default function MomentumSurferDashboard() {
                   return (
                     <div
                       key={index}
-                      className={`p-3 rounded-lg border transition-all ${
+                      className={`p-2 border transition-all ${
                         isArbitrage &&
                         (price.price === minPrice || price.price === maxPrice)
-                          ? "bg-[#0a0a0a] border-[#0ea5e9]"
-                          : "bg-[#0a0a0a] border-[#333333]"
+                          ? "bg-[#f5f5f0] border-[#00ff00] border-2"
+                          : "bg-[#f5f5f0] border-black"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-white">
-                            {price.chain}
+                          <span className="font-bold text-black text-xs">
+                            {price.chain.toUpperCase()}
                           </span>
-                          <span className="text-sm text-[#a0a0a0]">
+                          <span className="text-xs text-black">
                             {price.symbol}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
                           <div className="text-right">
-                            <div className="font-mono font-bold text-white">
+                            <div className="text-black font-bold text-xs">
                               ${price.price.toLocaleString()}
                             </div>
                             <div
-                              className={`text-xs font-semibold ${
+                              className={`text-xs font-bold ${
                                 price.change >= 0
-                                  ? "text-[#0ea5e9]"
-                                  : "text-[#ff4444]"
+                                  ? "text-[#00ff00]"
+                                  : "text-[#ff0000]"
                               }`}
                             >
                               {price.change >= 0 ? "+" : ""}
@@ -525,17 +529,17 @@ export default function MomentumSurferDashboard() {
                           {isArbitrage && price.price === minPrice && (
                             <Button
                               size="sm"
-                              className="bg-[#0ea5e9] hover:bg-[#0284c7] text-black text-xs font-bold"
+                              className="bg-[#00ff00] hover:bg-[#00cc00] text-black text-xs font-bold border border-black rounded-none px-2 py-1"
                             >
-                              Buy Here
+                              BUY
                             </Button>
                           )}
                           {isArbitrage && price.price === maxPrice && (
                             <Button
                               size="sm"
-                              className="bg-[#ff4444] hover:bg-[#cc3333] text-white text-xs font-bold"
+                              className="bg-[#ff0000] hover:bg-[#cc0000] text-white text-xs font-bold border border-black rounded-none px-2 py-1"
                             >
-                              Sell Here
+                              SELL
                             </Button>
                           )}
                         </div>
@@ -547,99 +551,85 @@ export default function MomentumSurferDashboard() {
             </CardContent>
           </Card>
 
-          {/* Performance Metrics - Full Width */}
-          <Card className="bg-[#1a1a1a] border-[#333333]">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium text-white">
-                Surfing Metrics
+          {/* Performance Metrics */}
+          <Card className="bg-[#f5f5f0] border border-black rounded-none">
+            <CardHeader className="border-b border-black pb-2">
+              <CardTitle className="text-sm font-bold text-black">
+                SURFING METRICS
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
-                  <div className="text-2xl font-black text-[#0ea5e9]">
-                    $1,240
-                  </div>
-                  <div className="text-sm text-[#a0a0a0] font-semibold">
-                    Today's P&L
-                  </div>
-                  <div className="text-xs text-[#0ea5e9] font-bold">+11.2%</div>
+            <CardContent className="p-3">
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="text-center p-2 border border-black">
+                  <div className="text-lg font-bold text-[#00ff00]">$1240</div>
+                  <div className="text-xs text-black">TODAY P&L</div>
+                  <div className="text-xs text-[#00ff00] font-bold">+11.2%</div>
                 </div>
-                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
-                  <div className="text-2xl font-black text-white">12</div>
-                  <div className="text-sm text-[#a0a0a0] font-semibold">
-                    Momentum Trades
-                  </div>
-                  <div className="text-xs text-[#a0a0a0] font-bold">Today</div>
+                <div className="text-center p-2 border border-black">
+                  <div className="text-lg font-bold text-black">12</div>
+                  <div className="text-xs text-black">TRADES</div>
+                  <div className="text-xs text-black">TODAY</div>
                 </div>
-                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
-                  <div className="text-2xl font-black text-white">24m</div>
-                  <div className="text-sm text-[#a0a0a0] font-semibold">
-                    Avg Surf Time
-                  </div>
+                <div className="text-center p-2 border border-black">
+                  <div className="text-lg font-bold text-black">24M</div>
+                  <div className="text-xs text-black">AVG TIME</div>
                 </div>
-                <div className="text-center p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
-                  <div className="text-2xl font-black text-white">BSC</div>
-                  <div className="text-sm text-[#a0a0a0] font-semibold">
-                    Best Chain
-                  </div>
-                  <div className="text-xs text-[#0ea5e9] font-bold">+$340</div>
+                <div className="text-center p-2 border border-black">
+                  <div className="text-lg font-bold text-black">BSC</div>
+                  <div className="text-xs text-black">BEST CHAIN</div>
+                  <div className="text-xs text-[#00ff00] font-bold">+$340</div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-[#0a0a0a] border border-[#333333] mb-4">
-                <div className="text-sm text-[#a0a0a0] font-semibold mb-3">
-                  Account Growth
+              <div className="p-2 border border-black mb-3">
+                <div className="text-xs text-black font-bold mb-2">
+                  ACCOUNT GROWTH
                 </div>
-                <SimpleLineChart />
+                <RetroLineChart />
               </div>
 
-              <div className="p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]">
+              <div className="p-2 border border-black">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-[#a0a0a0] font-semibold">
-                    Surf Mode
+                  <span className="text-xs text-black font-bold">
+                    SURF MODE
                   </span>
                   <Switch checked={surfMode} onCheckedChange={setSurfMode} />
                 </div>
-                <div className="text-xs text-[#a0a0a0] mb-3">
-                  Auto-execute when momentum &gt;5% detected
+                <div className="text-xs text-black mb-2">
+                  AUTO-EXECUTE WHEN MOMENTUM &gt;5%
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#a0a0a0] font-semibold">
-                      Risk Level:
-                    </span>
+                    <span className="text-xs text-black font-bold">RISK:</span>
                     <div className="flex space-x-1">
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-xs h-6 px-2 bg-transparent border-[#333333] text-[#a0a0a0]"
+                        className="text-xs h-5 px-1 bg-[#f5f5f0] border-black text-black rounded-none"
                       >
-                        Low
+                        LOW
                       </Button>
                       <Button
                         size="sm"
-                        className="text-xs h-6 px-2 bg-[#0ea5e9] text-black font-bold"
+                        className="text-xs h-5 px-1 bg-black text-[#f5f5f0] font-bold rounded-none"
                       >
-                        Medium
+                        MED
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="text-xs h-6 px-2 bg-transparent border-[#333333] text-[#a0a0a0]"
+                        className="text-xs h-5 px-1 bg-[#f5f5f0] border-black text-black rounded-none"
                       >
-                        High
+                        HIGH
                       </Button>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#a0a0a0] font-semibold">
-                      Max Per Surf:
+                    <span className="text-xs text-black font-bold">
+                      MAX PER SURF:
                     </span>
-                    <span className="text-xs text-white font-mono font-bold">
-                      $500
-                    </span>
+                    <span className="text-xs text-black font-bold">$500</span>
                   </div>
                 </div>
               </div>
@@ -647,45 +637,48 @@ export default function MomentumSurferDashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 mt-6">
+        {/* Divider Line */}
+        <div className="w-full h-px bg-black my-4" />
+
+        <div className="grid grid-cols-1 gap-4">
           {/* Section 4 - Trade Log */}
-          <Card className="bg-[#1a1a1a] border-[#333333]">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium text-white">
-                Trade Log
+          <Card className="bg-[#f5f5f0] border border-black rounded-none">
+            <CardHeader className="border-b border-black pb-2">
+              <CardTitle className="text-sm font-bold text-black">
+                TRADE LOG
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="p-3">
+              <div className="space-y-1">
                 {mockExecutions.map((execution) => (
                   <div
                     key={execution.id}
-                    className="flex items-center justify-between p-3 rounded-lg bg-[#0a0a0a] border border-[#333333]"
+                    className="flex items-center justify-between p-2 border border-black bg-[#f5f5f0]"
                   >
                     <div className="flex items-center space-x-3">
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-mono text-sm text-[#a0a0a0] font-semibold">
+                          <span className="text-xs text-black font-bold">
                             {execution.time}
                           </span>
-                          <span className="font-semibold text-white">
+                          <span className="font-bold text-black text-xs">
                             {execution.token}
                           </span>
-                          <span className="text-sm text-[#a0a0a0]">
+                          <span className="text-xs text-black">
                             {execution.chains}
                           </span>
                         </div>
-                        <div className="text-xs text-[#a0a0a0] capitalize font-semibold">
-                          {execution.status}
+                        <div className="text-xs text-black font-bold">
+                          {execution.status.toUpperCase()}
                         </div>
                       </div>
                     </div>
                     {execution.pnl !== 0 && (
                       <div
-                        className={`font-mono text-sm font-bold ${
+                        className={`text-xs font-bold ${
                           execution.pnl >= 0
-                            ? "text-[#0ea5e9]"
-                            : "text-[#ff4444]"
+                            ? "text-[#00ff00]"
+                            : "text-[#ff0000]"
                         }`}
                       >
                         {execution.pnl >= 0 ? "+" : ""}${execution.pnl}
@@ -700,22 +693,22 @@ export default function MomentumSurferDashboard() {
       </main>
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-8 right-8 z-20">
+      <div className="fixed bottom-6 right-6 z-20">
         <Button
           size="lg"
-          className="rounded-full bg-[#0ea5e9] hover:bg-[#0284c7] text-black font-black shadow-lg"
+          className="bg-[#f5f5f0] hover:bg-black/10 text-black font-bold border-2 border-black rounded-none shadow-none"
           onClick={handleMomentumScan}
           disabled={isScanning}
         >
           {isScanning ? (
             <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               SCANNING...
             </>
           ) : (
             <>
-              <Zap className="w-5 h-5 mr-2" />
-              DETECT MOMENTUM NOW
+              <Zap className="w-4 h-4 mr-2" />
+              DETECT NOW
             </>
           )}
         </Button>
